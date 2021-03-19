@@ -1,0 +1,16 @@
+version: "3"
+services:
+  tapp:
+    container_name: tapp-pulseaudio-client
+    build:
+      context: .
+    volumes:
+      - ./volumes/records:/records
+    # ports:
+      # - "3000:3000"
+    stdin_open: true
+    tty: true
+    restart: always
+  # audiowaveform:
+  #   container_name: tapp-audiowaveform
+  #   image: realies/audiowaveform
