@@ -1,4 +1,4 @@
-from alpine:latest
+from ruby:2.7.2-alpine3.13
 
 RUN apk update && \
  apk add --virtual build-dependencies cmake curl git jq make && \
