@@ -1,4 +1,5 @@
 require 'bindata'
+require 'pry'
 
 VERSION_FLAG_1 = 1
 VERSION_FLAG_2 = 2
@@ -8,42 +9,52 @@ class Tapp
     endian :little
     uint32 :flags
     int32 :sample_rate
-    int32 :samples
-    uint32 :length
+    int32 :per_pixel
+    uint32 :data_length
   end
 
   class Header_2 < BinData::Record
     endian :little
     uint32 :flags
     int32 :sample_rate
-    int32 :samples
-    uint32 :length
+    int32 :per_pixel
+    uint32 :data_length
     int32 :channels
   end
 end
 
 
 ## main loop
-
-# read version
-$stdin.each_byte.each_slice(4) do |bytes|
-  version = bytes
+source = ARGV[0]
+if source == '-'
+  stream = $stdin
+else
+  stream = File.open(source)
 end
+
+# read version header
+version_field = stream.read(4)
+version = version_field.reverse.unpack('N').first
 
 case version
 when VERSION_FLAG_1 then
-  structure = Header_1
+  structure = Tapp::Header_1
 when VERSION_FLAG_2 then
-  structure = Header_2
+  structure = Tapp::Header_2
 end
 
-# read header
-header = structure.read($stdin)
+# read entire header
+header = structure.read(stream)
 
-p header.flags
-p header.sample_rate
-p header.samples
-p header.length
-p header.channels
+p 'flags: %d' % header.flags
+p 'sample_rate: %d' % header.sample_rate
+p 'per_pixel: %d' % header.per_pixel
+p 'length: %d' % header.data_length
+
+if version == 2
+  p 'channels: %d' % header.channels
+else
+  p 'channels: no'
+end
 
 # read data
