@@ -5,6 +5,8 @@ services:
     build:
       context: .
     volumes:
+      #- ./tapp.rb:/tapp/tapp.rb
+      - .:/tapp
       - ./volumes/records:/records
     # ports:
       # - "3000:3000"
