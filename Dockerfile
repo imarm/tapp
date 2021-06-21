@@ -24,4 +24,14 @@ RUN apk update && \
 
 RUN apk add pulseaudio pulseaudio-utils
 
+ENV APP_HOME /tapp
+
+RUN mkdir -p $APP_HOME
+ADD Gemfile Gemfile.lock $APP_HOME
+
+WORKDIR $APP_HOME
+RUN bundle install
+
+ADD . $APP_HOME
+
 entrypoint ["/bin/ash"]
