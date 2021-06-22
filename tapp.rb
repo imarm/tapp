@@ -58,20 +58,22 @@ else
 end
 
 # read data
-resolution = header.flags == 0 ? 16 : 8
-bindata_type = 'int%d' % resolution
+bindata_type = header.flags == 0 ? 'int16le' : 'int8'
 
-class Tapp
-  class Data < BinData::Record
-    header.channels.times do |i|
-      # int8 :channel_i
-      # としたい
+channels = version == 2 ? header.channels : 1
 
-      # int8 を動的にコールするには
-      self.send(bindata_type, 'min_%d' % i)
-      self.send(bindata_type, 'max_%d' % i)
-    end
-  end
+fields = []
+channels.times do |i|
+  fields.push([bindata_type.to_sym, ('min_%d' % i).to_sym])
+  fields.push([bindata_type.to_sym, ('max_%d' % i).to_sym])
 end
 
-binding.pry
+BinData::Struct.new(name: :unit,
+                    fields: fields)
+
+data_field = BinData::Array.new(type: :unit, initial_length: header.data_length)
+data = data_field.read(stream)
+
+data.each do |one|
+  p '%d %d' % [one['min_0'], one['max_0']]
+end
