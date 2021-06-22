@@ -58,3 +58,20 @@ else
 end
 
 # read data
+resolution = header.flags == 0 ? 16 : 8
+bindata_type = 'int%d' % resolution
+
+class Tapp
+  class Data < BinData::Record
+    header.channels.times do |i|
+      # int8 :channel_i
+      # としたい
+
+      # int8 を動的にコールするには
+      self.send(bindata_type, 'min_%d' % i)
+      self.send(bindata_type, 'max_%d' % i)
+    end
+  end
+end
+
+binding.pry
