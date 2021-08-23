@@ -46,6 +46,7 @@ end
 # read entire header
 header = structure.read(stream)
 
+if false
 p 'flags: %d' % header.flags
 p 'sample_rate: %d' % header.sample_rate
 p 'per_pixel: %d' % header.per_pixel
@@ -55,6 +56,7 @@ if version == 2
   p 'channels: %d' % header.channels
 else
   p 'channels: no'
+end
 end
 
 # read data
@@ -74,6 +76,45 @@ BinData::Struct.new(name: :unit,
 data_field = BinData::Array.new(type: :unit, initial_length: header.data_length)
 data = data_field.read(stream)
 
+threshold = 3
+phase = :down
+
+seq = 1
+prev = 0
+rep = 0
+_found = 0
 data.each do |one|
-  p '%d %d' % [one['min_0'], one['max_0']]
+  max = one['max_0']
+
+  if phase == :down
+    if max > prev
+      rep += 1
+    else
+      rep = 0
+    end
+  else
+    if max < prev
+      rep += 1
+    else
+      rep = 0
+    end
+  end
+
+  marker = 1 # grey
+  if rep == threshold
+    rep = 0
+    phase = phase == :up ? :down : :up
+
+    if phase == :down
+      marker = 2 # red
+      _found += 1
+    end
+  end
+
+  printf "%d %d %d\n", seq += 1, max, marker
+  # printf "%5d %7d %7d %d %d %s %s\n", seq += 1, max, prev, marker, rep, phase.to_s, marker == 2 ? 'found' : ''
+
+  prev = max
 end
+
+printf "found: %d", _found
