@@ -46,19 +46,6 @@ end
 # read entire header
 header = structure.read(stream)
 
-if false
-p 'flags: %d' % header.flags
-p 'sample_rate: %d' % header.sample_rate
-p 'per_pixel: %d' % header.per_pixel
-p 'length: %d' % header.data_length
-
-if version == 2
-  p 'channels: %d' % header.channels
-else
-  p 'channels: no'
-end
-end
-
 # read data
 bindata_type = header.flags == 0 ? 'int16le' : 'int8'
 
