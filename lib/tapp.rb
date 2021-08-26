@@ -1,4 +1,5 @@
 require 'bindata'
+require_relative 'parser_sequence'
 
 class Tapp
   VERSION_FLAG_1 = 1
@@ -25,6 +26,7 @@ class Tapp
 
   def initialize(stream)
     @stream = stream
+    @parser_klass = Parser::Sequence
   end
 
   def read_header
@@ -48,6 +50,11 @@ class Tapp
   def read_body
     structure = body_structure
     structure.read(@stream)
+  end
+
+  def parse(data)
+    parser = @parser_klass.new(data)
+    parser.parse
   end
 
   private
