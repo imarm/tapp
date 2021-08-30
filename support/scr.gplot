@@ -1,0 +1,7 @@
+set terminal png
+set output 'peak.png'
+set size nosquare
+set size ratio 0.2
+
+set palette defined (0 "blue", 1 "grey", 2 "red")
+plot 'out.tapp.colored' using 1:2:3 with lp lc palette
